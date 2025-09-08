@@ -20,7 +20,7 @@ jobs:
     
     strategy:
       matrix:
-        configuration: [Debug, Release]
+        configuration: [Release]
         
     env:
       SkipBinariesExtract: true
@@ -39,9 +39,12 @@ jobs:
     - name: Cache NuGet packages
       uses: actions/cache@v4
       with:
-        path: ~/.nuget/packages
-        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets') }}
+        path: |
+          ~/.nuget/packages
+          ~/.nuget/v3-cache
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/packages.lock.json') }}
         restore-keys: |
+          ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
           ${{ runner.os }}-nuget-
           
     - name: Restore NuGet packages
@@ -91,12 +94,8 @@ jobs:
         # Copy all published files to the release package
         Copy-Item -Path "publish/Release/*" -Destination "release-package/Translumo/" -Recurse -Force
         
-        # Create necessary directories that might be needed at runtime
+        # Create only essential directories that are needed at runtime
         New-Item -ItemType Directory -Force -Path "release-package/Translumo/models"
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/models/easyocr"
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/models/tessdata"
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/models/prediction"
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/python"
         New-Item -ItemType Directory -Force -Path "release-package/Translumo/logs"
         
         # Create a README file for the release
@@ -151,7 +150,7 @@ jobs:
         retention-days: 30
         
     - name: Upload test results
-      if: always()
+      if: always() && hashFiles('TestResults/**/*') != ''
       uses: actions/upload-artifact@v4
       with:
         name: test-results-${{ matrix.configuration }}-${{ github.sha }}
