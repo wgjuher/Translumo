@@ -24,6 +24,7 @@ using Translumo.OCR.Configuration;
 using Translumo.Processing;
 using Translumo.Processing.Configuration;
 using Translumo.Processing.Interfaces;
+using Translumo.Processing.Services;
 using Translumo.Processing.TextProcessing;
 using Translumo.Services;
 using Translumo.Translation;
@@ -97,6 +98,7 @@ namespace Translumo
             services.AddScoped<HotkeysSettingsViewModel>();
             services.AddScoped<LanguagesSettingsViewModel>();
             services.AddScoped<OcrSettingsViewModel>();
+            services.AddScoped<ProcessingSettingsViewModel>();
 
             var chatWindowConfiguration = ChatWindowConfiguration.Default;
             services.AddSingleton<OcrGeneralConfiguration>(OcrGeneralConfiguration.Default);
@@ -106,6 +108,7 @@ namespace Translumo
             services.AddSingleton<HotKeysConfiguration>(HotKeysConfiguration.Default);
             services.AddSingleton<SystemConfiguration>(SystemConfiguration.Default);
             services.AddSingleton<TextProcessingConfiguration>(chatWindowConfiguration.TextProcessing);
+            services.AddSingleton<FrameComparisonConfiguration>(chatWindowConfiguration.TextProcessing.FrameComparison);
 
             var chatMediatorInstance = new ChatUITextMediator();
             services.AddSingleton<IChatTextMediator, ChatUITextMediator>(provider => chatMediatorInstance);
@@ -135,6 +138,7 @@ namespace Translumo
             services.AddTransient<IEncryptionService, AesEncryptionService>();
             services.AddTransient<LanguageDescriptorFactory>();
             services.AddTransient<TtsFactory>();
+            services.AddTransient<IFrameComparisonService, FrameComparisonService>();
 
 
             services.AddConfigurationStorage();

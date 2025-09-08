@@ -83,6 +83,19 @@
     <system:String x:Key="Str.OcrSettings.EasyOcrDesc" xml:space="preserve">The most advanced open-source OCR solution by Jaided AI.&#13;High precision of text recognition even with a complex background and uncommon fonts.&#13;&lt;Bold&gt;Performance impact:&lt;/Bold&gt; high</system:String>
     <system:String x:Key="Str.OcrSettings.EasyOcrDesc2">Installation additional packages (Python, PyTorch) is required</system:String>
 
+    <!--Processing settings-->
+    <system:String x:Key="Str.ProcessingSettings.TextProcessing">Text Processing</system:String>
+    <system:String x:Key="Str.ProcessingSettings.KeepFormatting">Keep source formatting</system:String>
+    <system:String x:Key="Str.ProcessingSettings.AutoClearTexts">Auto clear window</system:String>
+    <system:String x:Key="Str.ProcessingSettings.AutoClearTextsDelay">Auto clear delay</system:String>
+    <system:String x:Key="Str.ProcessingSettings.FrameComparison">Frame Comparison</system:String>
+    <system:String x:Key="Str.ProcessingSettings.EnableFrameComparison">Enable frame comparison</system:String>
+    <system:String x:Key="Str.ProcessingSettings.FrameComparisonDesc" xml:space="preserve">Only trigger translation when screen content has been stable for a specified number of frames.&#13;This reduces unnecessary translations and improves performance when content is not changing.&#13;&lt;Bold&gt;Performance impact:&lt;/Bold&gt; positive (reduces CPU usage)</system:String>
+    <system:String x:Key="Str.ProcessingSettings.StableFramesRequired">Stable frames required</system:String>
+    <system:String x:Key="Str.ProcessingSettings.SimilarityThreshold">Similarity threshold</system:String>
+    <system:String x:Key="Str.ProcessingSettings.UseGrayscaleComparison">Use grayscale comparison</system:String>
+    <system:String x:Key="Str.ProcessingSettings.GrayscaleComparisonDesc" xml:space="preserve">Convert frames to grayscale before comparison for better performance.&#13;Recommended for most use cases unless color changes are important for detection.</system:String>
+
     <!--About window-->
     <system:String x:Key="Str.About.DevelopedBy">Developed by Danil Iushkov</system:String>
     <system:String x:Key="Str.About.ProjectPage">Project page</system:String>
@@ -92,6 +105,7 @@
     <system:String x:Key="Str.Navigation.Languages">Languages</system:String>
     <system:String x:Key="Str.Navigation.Appearance">Appearance</system:String>
     <system:String x:Key="Str.Navigation.Ocr">Text recognition</system:String>
+    <system:String x:Key="Str.Navigation.Processing">Processing</system:String>
     <system:String x:Key="Str.Navigation.HotKeys">Hotkeys</system:String>
 
     <!--Languages-->

@@ -8,7 +8,8 @@ namespace Translumo.Processing.Configuration
         {
             KeepFormatting = false,
             AutoClearTexts = false,
-            AutoClearTextsDelayMs = 1000
+            AutoClearTextsDelayMs = 1000,
+            FrameComparison = FrameComparisonConfiguration.Default
         };
 
         public bool KeepFormatting
@@ -38,8 +39,18 @@ namespace Translumo.Processing.Configuration
             }
         }
 
+        public FrameComparisonConfiguration FrameComparison
+        {
+            get => _frameComparison;
+            set
+            {
+                SetProperty(ref _frameComparison, value);
+            }
+        }
+
         private bool _keepFormatting;
         private bool _autoClearTexts;
         private uint _autoClearTextsDelayMs;
+        private FrameComparisonConfiguration _frameComparison;
     }
 }

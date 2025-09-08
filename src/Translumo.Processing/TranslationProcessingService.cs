@@ -44,6 +44,7 @@ namespace Translumo.Processing
         private TranslationConfiguration _translationConfiguration;
         private OcrGeneralConfiguration _ocrGeneralConfiguration;
         private TextProcessingConfiguration _textProcessingConfiguration;
+        private IFrameComparisonService _frameComparisonService;
 
         private CancellationTokenSource _ctSource;
         private IScreenCapturer _capturer;
@@ -55,8 +56,9 @@ namespace Translumo.Processing
         
         public TranslationProcessingService(ICapturerFactory capturerFactory, IChatTextMediator chatTextMediator, OcrEnginesFactory ocrEnginesFactory,
             TranslatorFactory translationFactory, TtsFactory ttsFactory, TtsConfiguration ttsConfiguration,
-            TextDetectionProvider textProvider, TranslationConfiguration translationConfiguration, OcrGeneralConfiguration ocrConfiguration, 
-            TextResultCacheService textResultCacheService, TextProcessingConfiguration textConfiguration, ILogger<TranslationProcessingService> logger)
+            TextDetectionProvider textProvider, TranslationConfiguration translationConfiguration, OcrGeneralConfiguration ocrConfiguration,
+            TextResultCacheService textResultCacheService, TextProcessingConfiguration textConfiguration,
+            IFrameComparisonService frameComparisonService, ILogger<TranslationProcessingService> logger)
         {
             _logger = logger;
             _chatTextMediator = chatTextMediator;
@@ -71,6 +73,7 @@ namespace Translumo.Processing
             _ttsConfiguration = ttsConfiguration;
             _ttsEngine = ttsFactory.CreateTtsEngine(ttsConfiguration);
             _textProcessingConfiguration = textConfiguration;
+            _frameComparisonService = frameComparisonService;
             _engines = InitializeEngines();
             _translator = _translatorFactory.CreateTranslator(_translationConfiguration);
             _textProvider.Language = translationConfiguration.TranslateFromLang;
@@ -94,6 +97,7 @@ namespace Translumo.Processing
             }
 
             _lastTranslatedTextTicks = DateTime.UtcNow.Ticks;
+            _frameComparisonService.Reset(); // Reset frame comparison state when starting
             _ctSource = new CancellationTokenSource();
             Task.Factory.StartNew(() => TranslateInternal(_ctSource.Token));
 
@@ -114,6 +118,7 @@ namespace Translumo.Processing
         public void StopProcessing()
         {
             _ctSource.Cancel();
+            _frameComparisonService.Reset(); // Reset frame comparison state when stopping
 
             _chatTextMediator.SendText("Translation finished", TextTypes.Info);
         }
@@ -199,6 +204,14 @@ namespace Translumo.Processing
                         }
 
                         byte[] screenshot = _capturer.CaptureScreen();
+                        
+                        // Check frame comparison before proceeding with OCR
+                        if (!_frameComparisonService.ShouldProcessFrame(screenshot))
+                        {
+                            lastIterationType = IterationType.Short;
+                            continue; // Skip OCR processing if frame hasn't been stable long enough
+                        }
+                        
                         var primaryDetected = _textProvider.GetText(primaryOcr, screenshot);
                         lastIterationType = IterationType.Short;
                         if (primaryDetected.ValidityScore == 0 || _textResultCacheService.IsCached(primaryDetected.Text, sequentialText))
@@ -430,6 +443,7 @@ namespace Translumo.Processing
             _textProvider.Dispose();
             _capturer?.Dispose();
             _onceTimeCapturer?.Dispose();
+            _frameComparisonService?.Dispose();
         }
 
         private enum IterationType : byte
