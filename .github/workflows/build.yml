@@ -1,0 +1,210 @@
+name: Build and Release
+
+on:
+  push:
+    branches: [ main, master, develop ]
+    tags: [ 'v*' ]
+  pull_request:
+    branches: [ main, master, develop ]
+  workflow_dispatch:
+
+env:
+  SOLUTION_NAME: Translumo.sln
+  MAIN_PROJECT: src/Translumo/Translumo.csproj
+  SKIP_BINARIES_EXTRACT: true
+
+jobs:
+  build:
+    name: Build ${{ matrix.configuration }}
+    runs-on: windows-latest
+    
+    strategy:
+      matrix:
+        configuration: [Debug, Release]
+        
+    env:
+      SkipBinariesExtract: true
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+        
+    - name: Setup .NET 7 SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '7.0.x'
+        
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj', '**/*.props', '**/*.targets') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-
+          
+    - name: Restore NuGet packages
+      run: dotnet restore ${{ env.SOLUTION_NAME }}
+      
+    - name: Build solution
+      run: |
+        dotnet build ${{ env.SOLUTION_NAME }} `
+          --configuration ${{ matrix.configuration }} `
+          --no-restore `
+          --verbosity normal `
+          /p:SkipBinariesExtract=true
+          
+    - name: Run tests
+      run: |
+        $testProjects = Get-ChildItem -Path . -Recurse -Name "*.Tests.csproj"
+        if ($testProjects.Count -gt 0) {
+          dotnet test ${{ env.SOLUTION_NAME }} `
+            --configuration ${{ matrix.configuration }} `
+            --no-build `
+            --verbosity normal `
+            --logger trx `
+            --results-directory TestResults
+        } else {
+          Write-Host "No test projects found, skipping test execution"
+        }
+      shell: pwsh
+      
+    - name: Publish application (Release only)
+      if: matrix.configuration == 'Release'
+      run: |
+        dotnet publish ${{ env.MAIN_PROJECT }} `
+          --configuration Release `
+          --runtime win10-x64 `
+          --self-contained true `
+          --output "publish/Release" `
+          /p:PublishSingleFile=true `
+          /p:SkipBinariesExtract=true `
+          /p:IncludeAllContentForSelfExtract=true
+          
+    - name: Upload build artifacts (Release only)
+      if: matrix.configuration == 'Release'
+      uses: actions/upload-artifact@v4
+      with:
+        name: translumo-release-${{ github.sha }}
+        path: |
+          publish/Release/Translumo.exe
+          publish/Release/Translumo.pdb
+        retention-days: 30
+        
+    - name: Upload test results
+      if: always()
+      uses: actions/upload-artifact@v4
+      with:
+        name: test-results-${{ matrix.configuration }}-${{ github.sha }}
+        path: TestResults/
+        retention-days: 7
+      continue-on-error: true
+
+  release:
+    name: Create Release
+    needs: build
+    runs-on: windows-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    
+    permissions:
+      contents: write
+      
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      
+    - name: Download release artifacts
+      uses: actions/download-artifact@v4
+      with:
+        name: translumo-release-${{ github.sha }}
+        path: release-assets/
+        
+    - name: Create release package
+      run: |
+        $tagName = "${{ github.ref_name }}"
+        $packageName = "Translumo-$tagName-win10-x64.zip"
+        Compress-Archive -Path "release-assets/*" -DestinationPath $packageName
+        echo "PACKAGE_NAME=$packageName" >> $env:GITHUB_ENV
+      shell: pwsh
+      
+    - name: Generate release notes
+      id: release_notes
+      run: |
+        $tagName = "${{ github.ref_name }}"
+        $releaseNotes = @"
+        ## Translumo $tagName
+        
+        ### 🚀 Features
+        - Advanced screen translation with real-time OCR
+        - Multiple OCR engines: Tesseract 5.2, Windows OCR, EasyOCR
+        - Translation services: Google Translate, Yandex, Naver Papago, DeepL
+        - Support for multiple languages and optimized performance
+        
+        ### 📋 System Requirements
+        - Windows 10 build 19041 (20H1) / Windows 11
+        - DirectX 11
+        - 8 GB RAM (for EasyOCR mode)
+        - 5 GB free storage space (for EasyOCR mode)
+        
+        ### 📦 Installation
+        1. Download the ZIP file below
+        2. Extract to your desired location
+        3. Run Translumo.exe
+        4. Configure OCR engines and languages in Settings
+        
+        ### ⚠️ Important Notes
+        - Application path must contain only Latin characters (Tesseract limitation)
+        - Use Borderless/Windowed mode in games for proper overlay display
+        - Install on SSD for better EasyOCR performance
+        
+        **Full Changelog**: https://github.com/${{ github.repository }}/compare/v${{ github.event.before }}...$tagName
+        "@
+        
+        $releaseNotes | Out-File -FilePath release-notes.md -Encoding utf8
+        echo "RELEASE_NOTES_FILE=release-notes.md" >> $env:GITHUB_ENV
+      shell: pwsh
+      
+    - name: Create GitHub Release
+      uses: softprops/action-gh-release@v2
+      with:
+        name: Translumo ${{ github.ref_name }}
+        body_path: ${{ env.RELEASE_NOTES_FILE }}
+        files: |
+          ${{ env.PACKAGE_NAME }}
+        draft: false
+        prerelease: ${{ contains(github.ref_name, '-') }}
+        generate_release_notes: true
+        make_latest: true
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  cleanup:
+    name: Cleanup old artifacts
+    runs-on: ubuntu-latest
+    if: always()
+    
+    steps:
+    - name: Delete old workflow artifacts
+      uses: actions/github-script@v7
+      with:
+        script: |
+          const artifacts = await github.rest.actions.listWorkflowRunArtifacts({
+            owner: context.repo.owner,
+            repo: context.repo.repo,
+            run_id: context.runId,
+          });
+          
+          const cutoff = new Date();
+          cutoff.setDate(cutoff.getDate() - 30);
+          
+          for (const artifact of artifacts.data.artifacts) {
+            if (new Date(artifact.created_at) < cutoff) {
+              console.log(`Deleting artifact: ${artifact.name}`);
+              await github.rest.actions.deleteArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id,
+              });
+            }
+          }
