@@ -36,8 +36,18 @@ The workflow runs parallel builds for:
 ### 📦 **Artifacts**
 
 #### Build Artifacts (Release only)
-- `Translumo.exe` - Self-contained single-file executable
-- `Translumo.pdb` - Debug symbols for troubleshooting
+- **Complete Application Directory Structure**:
+  - `Translumo.exe` - Main application executable
+  - `Translumo.dll` - Application libraries
+  - `*.dll` - All required dependencies
+  - `Translumo.pdb` - Debug symbols for troubleshooting
+  - `models/` - Directory for OCR and ML models (created empty, populated at runtime)
+    - `easyocr/` - EasyOCR models directory
+    - `tessdata/` - Tesseract language data directory
+    - `prediction/` - ML prediction models directory
+  - `python/` - Python runtime directory (populated at runtime)
+  - `logs/` - Application logs directory
+  - `README.txt` - Installation and usage instructions
 - **Retention**: 30 days
 
 #### Test Results
@@ -45,7 +55,8 @@ The workflow runs parallel builds for:
 - **Retention**: 7 days
 
 #### Release Packages (Tags only)
-- `Translumo-{version}-win10-x64.zip` - Complete release package
+- `Translumo-{version}-win10-x64.zip` - Complete application package with directory structure
+- Contains ready-to-run application with all necessary folders
 - Automatically attached to GitHub releases
 
 ## Usage Examples
