@@ -6,6 +6,8 @@ using Translumo.Infrastructure.Language;
 using Translumo.Infrastructure.Python;
 using Translumo.OCR;
 using Translumo.OCR.Configuration;
+using Translumo.OCR.WindowsOCR;
+using Translumo.OCR.Tesseract;
 using Translumo.Translation;
 using Translumo.Translation.Configuration;
 using Translumo.TTS;
@@ -105,7 +107,8 @@ public class BasicIntegrationTests
         var config = new TranslationConfiguration
         {
             Translator = Translators.Google,
-            ApiKey = "test-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act
@@ -167,7 +170,8 @@ public class BasicIntegrationTests
         var translationConfig = new TranslationConfiguration
         {
             Translator = Translators.Google,
-            ApiKey = "test-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         var ttsConfig = new TtsConfiguration
