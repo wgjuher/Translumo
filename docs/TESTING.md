@@ -265,6 +265,12 @@ The [`build.yml`](../.github/workflows/build.yml) workflow:
 - Verify `coverlet.runsettings` is in the solution root
 - Check that the `--collect:"XPlat Code Coverage"` argument is used
 
+**NuGet package download timeouts:**
+- The build includes retry logic with exponential backoff (60s, 120s, 240s)
+- Uses custom `nuget.config` with optimized settings
+- Clears NuGet cache before restore attempts
+- Disables parallel downloads to reduce network load
+
 **Windows-specific test failures:**
 - Some tests may require Windows-specific features (OCR, TTS)
 - Use conditional compilation or runtime checks for platform-specific code

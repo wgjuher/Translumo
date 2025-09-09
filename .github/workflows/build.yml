@@ -45,7 +45,39 @@ jobs:
           ${{ runner.os }}-nuget-
           
     - name: Restore NuGet packages
-      run: dotnet restore ${{ env.SOLUTION_NAME }}
+      run: |
+        # Configure NuGet with retry settings and timeout
+        dotnet nuget locals all --clear
+        
+        # Retry restore up to 3 times with exponential backoff
+        $maxRetries = 3
+        $retryCount = 0
+        $success = $false
+        
+        while (-not $success -and $retryCount -lt $maxRetries) {
+          try {
+            Write-Host "Restore attempt $($retryCount + 1) of $maxRetries"
+            dotnet restore ${{ env.SOLUTION_NAME }} `
+              --verbosity normal `
+              --disable-parallel `
+              --configfile nuget.config `
+              --runtime win10-x64
+            $success = $true
+            Write-Host "Restore successful on attempt $($retryCount + 1)"
+          }
+          catch {
+            $retryCount++
+            if ($retryCount -lt $maxRetries) {
+              $waitTime = [math]::Pow(2, $retryCount) * 30  # 60, 120, 240 seconds
+              Write-Host "Restore failed, waiting $waitTime seconds before retry..."
+              Start-Sleep -Seconds $waitTime
+            } else {
+              Write-Host "All restore attempts failed"
+              throw
+            }
+          }
+        }
+      shell: pwsh
       
     - name: Build solution
       run: |
