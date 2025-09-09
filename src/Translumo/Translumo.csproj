@@ -15,7 +15,6 @@
 		<PublishSingleFile>true</PublishSingleFile>
 		<ApplicationIcon>Resources\Icons\favicon.ico</ApplicationIcon>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
 	</PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
