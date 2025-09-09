@@ -194,7 +194,7 @@ public class StringExtensionsTests
 
         [Theory]
         [InlineData("night", "nacht", 0.25)] // "ni", "ig", "gh", "ht" vs "na", "ac", "ch", "ht" - only "ht" matches
-        [InlineData("context", "contact", 0.615)] // More overlap
+        [InlineData("context", "contact", 0.5)] // "co", "on", "nt", "te", "ex", "xt" vs "co", "on", "nt", "ta", "ac", "ct" - 3 matches out of 12 total = 6/12 = 0.5
         [InlineData("hello", "hallo", 0.5)] // "he", "el", "ll", "lo" vs "ha", "al", "ll", "lo" - "ll", "lo" match
         public void GetDiceSimilarity_WithKnownTestCases_ReturnsExpectedValues(string str1, string str2, double expected)
         {

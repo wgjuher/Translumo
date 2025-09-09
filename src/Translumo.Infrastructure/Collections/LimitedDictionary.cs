@@ -123,7 +123,7 @@ namespace Translumo.Infrastructure.Collections
             if (!containsKey && _dictionary.Count() >= Capacity)
             {
                 (_dictionary, _backupDictionary) = (_backupDictionary, _dictionary);
-                _backupDictionary.Clear();
+                _dictionary.Clear(); // Clear the new main dictionary (was backup)
             }
 
             if (!_dictionary.TryGetValue(key, out var curValue) || !curValue.Equals(value))

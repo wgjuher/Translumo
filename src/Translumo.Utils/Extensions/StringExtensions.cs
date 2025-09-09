@@ -58,12 +58,18 @@ namespace Translumo.Utils.Extensions
                     return 0;
                 }
 
+                // Handle single character strings - no bigrams can be formed
+                if (string1.Length < 2 || string2.Length < 2)
+                {
+                    return 0;
+                }
+
                 for (var i = 0; i < (string1.Length - 1); i++)
-                { 
+                {
                     bigrams1.Add(string1.Substring(i, 2));
                 }
                 for (int i = 0; i < (string2.Length - 1); i++)
-                {   
+                {
                     bigrams2.Add(string2.Substring(i, 2));
                 }
 
@@ -74,6 +80,13 @@ namespace Translumo.Utils.Extensions
                 }
                 
                 int total = bigrams1.Count + bigrams2.Count;
+                
+                // Avoid division by zero
+                if (total == 0)
+                {
+                    return 0;
+                }
+                
                 double dice = (intersection * 2) / (double)total;
 
                 return dice;
