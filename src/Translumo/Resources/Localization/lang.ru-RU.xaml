@@ -82,6 +82,19 @@
     <system:String x:Key="Str.OcrSettings.EasyOcrDesc" xml:space="preserve">Наиболее продвинутое open-source OCR решение от Jaided AI.&#13;Высокая точность определение даже со сложным фоном и нестандартными шрифтами.&#13;&lt;Bold&gt;Влияние на производительность:&lt;/Bold&gt; высокое</system:String>
     <system:String x:Key="Str.OcrSettings.EasyOcrDesc2">Необходима установка дополнительных модулей (Python, PyTorch)</system:String>
 
+    <!--Processing settings-->
+    <system:String x:Key="Str.ProcessingSettings.TextProcessing">Обработка текста</system:String>
+    <system:String x:Key="Str.ProcessingSettings.KeepFormatting">Сохранять исходное форматирование</system:String>
+    <system:String x:Key="Str.ProcessingSettings.AutoClearTexts">Автоочистка окна</system:String>
+    <system:String x:Key="Str.ProcessingSettings.AutoClearTextsDelay">Задержка автоочистки</system:String>
+    <system:String x:Key="Str.ProcessingSettings.FrameComparison">Сравнение кадров</system:String>
+    <system:String x:Key="Str.ProcessingSettings.EnableFrameComparison">Включить сравнение кадров</system:String>
+    <system:String x:Key="Str.ProcessingSettings.FrameComparisonDesc" xml:space="preserve">Запускать перевод только когда содержимое экрана стабильно в течение заданного количества кадров.&#13;Это уменьшает количество ненужных переводов и улучшает производительность при неизменном содержимом.&#13;&lt;Bold&gt;Влияние на производительность:&lt;/Bold&gt; положительное (снижает нагрузку на CPU)</system:String>
+    <system:String x:Key="Str.ProcessingSettings.StableFramesRequired">Требуемое количество стабильных кадров</system:String>
+    <system:String x:Key="Str.ProcessingSettings.SimilarityThreshold">Порог схожести</system:String>
+    <system:String x:Key="Str.ProcessingSettings.UseGrayscaleComparison">Использовать сравнение в оттенках серого</system:String>
+    <system:String x:Key="Str.ProcessingSettings.GrayscaleComparisonDesc" xml:space="preserve">Преобразовывать кадры в оттенки серого перед сравнением для лучшей производительности.&#13;Рекомендуется для большинства случаев использования, если изменения цвета не важны для обнаружения.</system:String>
+
     <!--About window-->
     <system:String x:Key="Str.About.DevelopedBy">Developed by Danil Iushkov</system:String>
     <system:String x:Key="Str.About.ProjectPage">Страница проекта</system:String>
@@ -91,6 +104,7 @@
     <system:String x:Key="Str.Navigation.Languages">Языки</system:String>
     <system:String x:Key="Str.Navigation.Appearance">Внешний вид</system:String>
     <system:String x:Key="Str.Navigation.Ocr">Распознавание текста</system:String>
+    <system:String x:Key="Str.Navigation.Processing">Обработка</system:String>
     <system:String x:Key="Str.Navigation.HotKeys">Горячие клавиши</system:String>
 
     <!--Languages-->
