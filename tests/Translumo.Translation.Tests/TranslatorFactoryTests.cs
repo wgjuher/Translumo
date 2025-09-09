@@ -13,6 +13,18 @@ using Xunit;
 
 namespace Translumo.Translation.Tests;
 
+/// <summary>
+/// Tests for TranslatorFactory.
+///
+/// NOTE: The current Translumo implementation uses web scraping for translation services
+/// rather than official APIs. This means:
+/// - DeepL: Uses free web interface (https://www2.deepl.com/jsonrpc) - no API key required
+/// - Google: Uses free web interface (https://translate.google.com/m) - no API key required
+/// - Yandex/Papago: Use their respective free web interfaces - no API keys required
+///
+/// If the implementation switches to official APIs in the future, the TranslationConfiguration
+/// would need to be extended with API key properties and these tests updated accordingly.
+/// </summary>
 public class TranslatorFactoryTests
 {
     private readonly Mock<LanguageService> _mockLanguageService;
@@ -39,7 +51,8 @@ public class TranslatorFactoryTests
         var config = new TranslationConfiguration
         {
             Translator = Translators.Deepl,
-            ApiKey = "test-api-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act
@@ -56,7 +69,8 @@ public class TranslatorFactoryTests
         var config = new TranslationConfiguration
         {
             Translator = Translators.Yandex,
-            ApiKey = "test-api-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act
@@ -73,7 +87,8 @@ public class TranslatorFactoryTests
         var config = new TranslationConfiguration
         {
             Translator = Translators.Papago,
-            ApiKey = "test-api-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act
@@ -90,7 +105,8 @@ public class TranslatorFactoryTests
         var config = new TranslationConfiguration
         {
             Translator = Translators.Google,
-            ApiKey = "test-api-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act
@@ -106,8 +122,9 @@ public class TranslatorFactoryTests
         // Arrange
         var config = new TranslationConfiguration
         {
-            Translator = (Translators)999, // Invalid translator
-            ApiKey = "test-api-key"
+            Translator = (Translators)255, // Invalid translator (using max byte value)
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act & Assert
@@ -121,7 +138,8 @@ public class TranslatorFactoryTests
         var config = new TranslationConfiguration
         {
             Translator = Translators.Deepl,
-            ApiKey = "test-api-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act
@@ -141,7 +159,8 @@ public class TranslatorFactoryTests
         var config = new TranslationConfiguration
         {
             Translator = Translators.Yandex,
-            ApiKey = "test-api-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act
@@ -170,7 +189,8 @@ public class TranslatorFactoryTests
         var config = new TranslationConfiguration
         {
             Translator = translatorType,
-            ApiKey = "test-api-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act
@@ -187,7 +207,8 @@ public class TranslatorFactoryTests
         var config = new TranslationConfiguration
         {
             Translator = Translators.Google,
-            ApiKey = "test-api-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
 
         // Act
@@ -207,13 +228,15 @@ public class TranslatorFactoryTests
         var deeplConfig = new TranslationConfiguration
         {
             Translator = Translators.Deepl,
-            ApiKey = "deepl-key"
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian
         };
         
         var googleConfig = new TranslationConfiguration
         {
             Translator = Translators.Google,
-            ApiKey = "google-key"
+            TranslateFromLang = Languages.Japanese,
+            TranslateToLang = Languages.English
         };
 
         // Act
@@ -233,15 +256,18 @@ public class TranslatorFactoryTests
         var config = new TranslationConfiguration
         {
             Translator = Translators.Yandex,
-            ApiKey = "complex-api-key-123",
-            Proxy = new Proxy
+            TranslateFromLang = Languages.English,
+            TranslateToLang = Languages.Russian,
+            ProxySettings = new List<Proxy>
             {
-                Host = "proxy.example.com",
-                Port = 8080,
-                Username = "user",
-                Password = "pass"
-            },
-            RequestTimeoutMs = 5000
+                new Proxy
+                {
+                    IpAddress = "proxy.example.com",
+                    Port = 8080,
+                    Login = "user",
+                    Password = "pass"
+                }
+            }
         };
 
         // Act
