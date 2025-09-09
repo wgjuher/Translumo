@@ -78,76 +78,18 @@ jobs:
           --runtime win10-x64 `
           --self-contained true `
           --output "publish/Release" `
-          /p:PublishSingleFile=false `
+          /p:PublishSingleFile=true `
           /p:SkipBinariesExtract=true `
-          /p:PublishReadyToRun=true
-          
-    - name: Create application directory structure (Release only)
-      if: matrix.configuration == 'Release'
-      run: |
-        # Create the main application directory
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo"
-        
-        # Copy all published files to the release package
-        Copy-Item -Path "publish/Release/*" -Destination "release-package/Translumo/" -Recurse -Force
-        
-        # Create necessary directories that might be needed at runtime
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/models"
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/models/easyocr"
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/models/tessdata"
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/models/prediction"
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/python"
-        New-Item -ItemType Directory -Force -Path "release-package/Translumo/logs"
-        
-        # Create a README file for the release
-        $readmeContent = @"
-        # Translumo - Advanced Screen Translator
-        
-        ## Quick Start
-        1. Run Translumo.exe to start the application
-        2. Configure OCR engines in Settings > Text Recognition
-        3. Set source and target languages in Settings > Languages
-        4. Select capture area and start translation
-        
-        ## System Requirements
-        - Windows 10 build 19041 (20H1) / Windows 11
-        - DirectX 11
-        - 8 GB RAM (for EasyOCR mode)
-        - 5 GB free storage space (for EasyOCR mode)
-        
-        ## Important Notes
-        - Application path must contain only Latin characters (Tesseract limitation)
-        - Use Borderless/Windowed mode in games for proper overlay display
-        - Install on SSD for better EasyOCR performance
-        
-        ## First Run
-        On first run, the application will download required components:
-        - Python runtime (~50MB)
-        - OCR models (~150MB)
-        - ML prediction models (~20MB)
-        
-        These will be automatically downloaded to the models/ and python/ directories.
-        
-        ## Troubleshooting
-        - If you get "Failed to capture screen" error, make sure the target window is active
-        - If translation fails, try changing the translator or configure proxy settings
-        - For Windows OCR issues, run as Administrator
-        - Check logs/ directory for detailed error information
-        "@
-        
-        $readmeContent | Out-File -FilePath "release-package/Translumo/README.txt" -Encoding utf8
-        
-        # List the contents for verification
-        Write-Host "Release package contents:"
-        Get-ChildItem -Path "release-package/Translumo" -Recurse | Select-Object FullName
-      shell: pwsh
+          /p:IncludeAllContentForSelfExtract=true
           
     - name: Upload build artifacts (Release only)
       if: matrix.configuration == 'Release'
       uses: actions/upload-artifact@v4
       with:
         name: translumo-release-${{ github.sha }}
-        path: release-package/Translumo/
+        path: |
+          publish/Release/Translumo.exe
+          publish/Release/Translumo.pdb
         retention-days: 30
         
     - name: Upload test results
@@ -182,23 +124,7 @@ jobs:
       run: |
         $tagName = "${{ github.ref_name }}"
         $packageName = "Translumo-$tagName-win10-x64.zip"
-        
-        # Create the ZIP file with the complete application structure
-        # The release-assets folder contains the Translumo directory with all files
-        Compress-Archive -Path "release-assets/*" -DestinationPath $packageName -Force
-        
-        # Verify the package contents
-        Write-Host "Created package: $packageName"
-        $zipInfo = Get-Item $packageName
-        Write-Host "Package size: $([math]::Round($zipInfo.Length / 1MB, 2)) MB"
-        
-        # List contents of the ZIP for verification
-        Add-Type -AssemblyName System.IO.Compression.FileSystem
-        $zip = [System.IO.Compression.ZipFile]::OpenRead($packageName)
-        Write-Host "Package contents:"
-        $zip.Entries | ForEach-Object { Write-Host "  $($_.FullName)" }
-        $zip.Dispose()
-        
+        Compress-Archive -Path "release-assets/*" -DestinationPath $packageName
         echo "PACKAGE_NAME=$packageName" >> $env:GITHUB_ENV
       shell: pwsh
       
