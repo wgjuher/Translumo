@@ -64,7 +64,9 @@ jobs:
             --no-build `
             --verbosity normal `
             --logger trx `
-            --results-directory TestResults
+            --results-directory TestResults `
+            --collect:"XPlat Code Coverage" `
+            --settings coverlet.runsettings
         } else {
           Write-Host "No test projects found, skipping test execution"
         }
