@@ -50,14 +50,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <DesignDataWithDesignTimeCreatableTypes Include="Resources\Icons\favicon.ico" />
+    <DesignDataWithDesignTimeCreatableTypes Include="Resources\Icons\favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </DesignDataWithDesignTimeCreatableTypes>
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Icons\favicon.ico" />
-    <Resource Include="Resources\Icons\HammersmithOne-Regular.ttf" />
-    <Resource Include="Resources\Icons\logo.png" />
-    <Resource Include="Resources\Icons\logo.svg" />
+    <Resource Include="Resources\Icons\favicon.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\HammersmithOne-Regular.ttf">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\logo.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -86,9 +96,15 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Resource Include="Resources\Icons\icons8-high-priority-40.png" />
-    <Resource Include="Resources\Icons\icons8-information-40.png" />
-    <Resource Include="Resources\Icons\logo_full.png" />
+    <Resource Include="Resources\Icons\icons8-high-priority-40.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\icons8-information-40.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
+    <Resource Include="Resources\Icons\logo_full.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Resource>
   </ItemGroup>
 
   <ItemGroup>
@@ -107,7 +123,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <None Update="Resources\Icons\icon.svg" />
+    <None Update="Resources\Icons\icon.svg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
